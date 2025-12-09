@@ -1,0 +1,145 @@
+---
+/**
+ * SEOHead.astro
+ * Comprehensive SEO head component combining all meta tags
+ * Usage: Place in <head> of layouts
+ */
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'product';
+  noindex?: boolean;
+  // Product data (optional)
+  product?: {
+    id: string;
+    name: string;
+    slug: string;
+    type: string;
+    brand: string | string[];
+    description?: string;
+    price?: number | null;
+    priceText?: string;
+    thumbnailUrl: string;
+    images: string[];
+    weight: number;
+    weightText: string;
+    dimensions: string;
+    length: number;
+    width: number;
+    height: number;
+    origin?: string;
+    isNew?: boolean;
+    engineModel?: string;
+    enginePower?: string;
+    trailerSpec?: any;
+    craneSpec?: any;
+    features?: string[];
+  };
+  categoryName?: string;
+  // Article data (optional)
+  article?: {
+    publishedTime?: string;
+    author?: string;
+    section?: string;
+    tags?: string[];
+  };
+}
+
+import SocialMeta from './SocialMeta.astro';
+import ProductSchema from './ProductSchema.astro';
+
+const {
+  title,
+  description,
+  canonical,
+  image = '/og-default.jpg',
+  type = 'website',
+  noindex = false,
+  product,
+  categoryName,
+  article
+} = Astro.props;
+
+const siteUrl = 'https://soosanmotor.com';
+const currentUrl = Astro.url.pathname;
+const canonicalUrl = canonical || `${siteUrl}${currentUrl}`;
+
+// Default OG image
+const ogImage = product?.thumbnailUrl || image;
+
+// Robots directive
+const robotsContent = noindex 
+  ? 'noindex, nofollow' 
+  : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+---
+
+<!-- Primary Meta Tags -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={robotsContent} />
+<meta name="googlebot" content={robotsContent} />
+<meta name="bingbot" content={robotsContent} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Language & Regional -->
+<meta http-equiv="Content-Language" content="vi" />
+<meta name="language" content="Vietnamese" />
+<meta name="geo.region" content="VN" />
+<meta name="geo.placename" content="Vietnam" />
+<meta name="geo.position" content="20.6;106.0" />
+<meta name="ICBM" content="20.6, 106.0" />
+
+<!-- Yandex Verification (replace with actual code) -->
+<!-- <meta name="yandex-verification" content="YOUR_YANDEX_CODE" /> -->
+
+<!-- Google Site Verification (replace with actual code) -->
+<!-- <meta name="google-site-verification" content="YOUR_GOOGLE_CODE" /> -->
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+<!-- Theme Color -->
+<meta name="theme-color" content="#dc2626" />
+<meta name="msapplication-TileColor" content="#dc2626" />
+
+<!-- Open Graph & Social Meta -->
+<SocialMeta 
+  title={title}
+  description={description}
+  image={ogImage}
+  url={currentUrl}
+  type={type}
+  brand={product ? (Array.isArray(product.brand) ? product.brand[0] : product.brand) : undefined}
+  price={product?.price}
+  priceText={product?.priceText}
+  publishedTime={article?.publishedTime}
+  author={article?.author}
+  section={article?.section}
+  tags={article?.tags}
+/>
+
+<!-- Product Schema (if product data provided) -->
+{product && (
+  <ProductSchema product={product} categoryName={categoryName} />
+)}
+
+<!-- Preconnect for performance -->
+<link rel="preconnect" href="https://cdn.soosanmotor.com" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- DNS Prefetch -->
+<link rel="dns-prefetch" href="https://cdn.soosanmotor.com" />
+<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+<!-- AI Crawlers Meta (GEO - Generative Engine Optimization) -->
+<meta name="ai-content-declaration" content="human-created" />
+<meta name="generator" content="Astro" />
